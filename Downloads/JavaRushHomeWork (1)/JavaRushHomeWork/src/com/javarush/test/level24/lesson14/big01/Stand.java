@@ -1,68 +1,72 @@
 package com.javarush.test.level24.lesson14.big01;
 
 /**
- * Created by ГРИГОРИЙ on 30.08.2016.
- * Задание 16
- И наконец "подставка"!
- Ей понадобятся такие переменные
- а) speed (скорость шарика) типа double
- б) direction (направление движения по оси x: 1 - вправо, -1 - влево) типа double
- в) создай для них геттеры
-
-
- А еще с тебя конструктор, примерно вот такой:
- public Stand(double x, double y)
- {
- super(x,y,3);
- speed = 1;
- direction = 0;
- }
+ *  Подставка, с помощью которой отражаем мячик.
  */
 public class Stand extends BaseObject
 {
-    private int width;
-    private int height;
-    private int x;
-    private int y;
+    //картинка для отрисовки
+    private static int[][] matrix = {
+            {1, 1, 1, 1, 1},
+            {1, 0, 0, 0, 1},
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0},
+    };
+
     //скорость
-    private double speed;
-    //направление  (в градусах от 0 до 360)
-    private double direction;
+    private double speed = 1;
+    //направление (-1 влево, +1 вправо)
+    private double direction = 0;
 
-    public Stand(double x, double y, double radius, int width, int height)
-    {
-        super(x, y, radius);
-        this.width = width;
-        this.height = height;
-
-    }
-
-    public Stand(double x, double y, double radius, int width, int height, int x1, int y1)
-    {
-        super(x, y, radius);
-        this.width = width;
-        this.height = height;
-        this.x = x1;
-        this.y = y1;
-    }
     public Stand(double x, double y)
     {
         super(x,y,3);
-        speed = 1;
-        direction = 0;
     }
 
-    public void move(){}
+    /**
+     * Метод передвигает подставку в соответствии с текущим значением direction.
+     */
+    public void move()
+    {
+        double dx = speed * direction;
+        x = x + dx;
 
-    public void draw(Canvas canvas){}
+        checkBorders(radius, Arcanoid.game.getWidth() - radius + 1, 1, Arcanoid.game.getHeight() + 1);
+    }
+
+    /**
+     * direction устанавливается равным -1
+     */
+    public void moveLeft()
+    {
+        direction = -1;
+    }
+
+    /**
+     * direction устанавливается равным +1
+     */
+    public void moveRight()
+    {
+        direction = 1;
+    }
+
+    public double getSpeed()
+    {
+        return speed;
+    }
 
     public double getDirection()
     {
         return direction;
     }
 
-    public double getSpeed()
+    /**
+     * Отрисовываем себя на холсте
+     */
+    @Override
+    public void draw(Canvas canvas)
     {
-        return speed;
+        canvas.drawMatrix(x - radius + 1, y, matrix, 'M');
     }
 }
