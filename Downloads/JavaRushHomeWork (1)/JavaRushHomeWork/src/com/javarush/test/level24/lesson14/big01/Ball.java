@@ -1,72 +1,132 @@
 package com.javarush.test.level24.lesson14.big01;
 
 /**
- * Created by ГРИГОРИЙ on 30.08.2016.
- * Задание 13
- Класс Ball уже посложнее - шарик же двигается.
- Нам понадобятся переменные
- а) speed (скорость шарика) типа double
- б) direction (направление движения в градусах: от 0 до 360) типа double
- в) dx (расстояние по x, которое проходит шарик за один шаг. вычисляется на основе speed и direction) типа double.
- г) dy (расстояние по y, которое проходит шарик за один шаг. вычисляется на основе speed и direction) типа double.
- д) isFrozen ("истина" если шарик "заморожен" - не двигается) типа boolean
- е) добавь геттеры для всех переменных этого класса
-
- А еще сделай-ка конструктор:
- а) в конструктор передаются x,y, speed, direction
- б) радиус (для родительского класса) всегда равен 1
- в) не забудь установить isFrozen в true - в начале игры шарик никуда не летит.
-
-
+ * Класс для шарика в игре
  */
 public class Ball extends BaseObject
 {
-    private int width;
-    private int height;
-   // private int x;
- //   private int y;
+    //скорость
     private double speed;
-    private double direction ;
-    private double dx  ;
-    private double dy ;
+    //направление  (в градусах от 0 до 360)
+    private double direction;
+
+    //текущее значение вектора движения (dx,dy)
+    private double dx;
+    private double dy;
+
+    //заморожен ли объект или может двигаться
     private boolean isFrozen;
-    public Ball(double x, double y, double radius, int width, int height)
-    {
-        super(x, y, radius);
-        this.width = width;
-        this.height = height;
-    }
 
-    public Ball(double x, double y, double radius, int width, int height, int x1, int y1)
-    {
-        super(x, y, radius);
-        this.width = width;
-        this.height = height;
-        this.x = x1;
-        this.y = y1;
-    }
-
-
-    public Ball(double x, double y,double speed, double direction)
+    public Ball(double x, double y, double speed, double direction)
     {
         super(x, y, 1);
+
         this.direction = direction;
-
         this.speed = speed;
-        this.isFrozen = true;
 
+        this.isFrozen = true;
     }
 
-    public void move(){}
-    public void draw(Canvas canvas){}
+    public double getSpeed()
+    {
+        return speed;
+    }
 
-    public int getWidth(){return width;}
-    public int getHeight(){return height;}
-  //  public double getX(){return x;}
-   // public double getY(){return y;}
-    public double getSpeed(){return speed;}
-    public double getDirection(){return direction ;}
-    public double getDx(){return dx;}
-    public double getDy(){return dy;}
-    public boolean getIsFrozen(){return isFrozen;}
+    public void setSpeed(double speed)
+    {
+        this.speed = speed;
+    }
+
+    public double getDirection()
+    {
+        return direction;
+    }
+
+    public double getDx()
+    {
+        return dx;
+    }
+
+    public double getDy()
+    {
+        return dy;
+    }
+
+    /**
+     * Устанавливаем новое направление движения.
+     * Тут же вычисляем и новый вектор.
+     * Тако подход удобно использовать при отскоках от стен.
+     */
+    public void setDirection(double direction)
+    {
+        this.direction = direction;
+
+        double angel = Math.toRadians(direction);
+        dx = Math.cos(angel) * speed;
+        dy = -Math.sin(angel) * speed;
+    }
+
+    /**
+     * Рисуем себя на "канвасе".
+     */
+    @Override
+    public void draw(Canvas canvas)
+    {
+        canvas.setPoint(x, y, 'O');
+    }
+
+    /**
+     * Двигаем себя на один шаг.
+     */
+    public void move()
+    {
+        if (isFrozen) return;
+
+        x += dx;
+        y += dy;
+
+        checkRebound(1, Arcanoid.game.getWidth(), 1, Arcanoid.game.getHeight() + 5);
+    }
+
+    /**
+     * Проверяем не улетел ли шарик за стенку.
+     * Если да - отражаем его.
+     */
+    public void checkRebound(int minx, int maxx, int miny, int maxy)
+    {
+        if (x < minx)
+        {
+            x = minx + (minx - x);
+            dx = -dx;
+        }
+
+        if (x > maxx)
+        {
+            x = maxx - (x - maxx);
+            dx = -dx;
+        }
+
+        if (y < miny)
+        {
+            y = miny + (miny - y);
+            dy = -dy;
+        }
+
+        if (y > maxy)
+        {
+            y = maxy - (y - maxy);
+            dy = -dy;
+        }
+    }
+
+    /**
+     * Запускам шарик.
+     * isFrozen = false.
+     * Пересчитываем вектор движения (dx,dy).
+     */
+    public void start()
+    {
+        this.setDirection(direction);
+        this.isFrozen = false;
+    }
 }
